@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React + TS</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+export default function KalkulatorLaffort() {
+  const [hl, setHl] = useState(0);
+  const [stock, setStock] = useState({
+    "LAFAZYM AROM": 0,
+    "SUPERSTART BLANC": 0,
+    "ZYMAFLORE XAROM": 0,
+  });
+
+  const zapotrzebowanie = {
+    "LAFAZYM AROM": hl * 3, // 3 g/hl
+    "SUPERSTART BLANC": hl * 20, // 20 g/hl
+    "ZYMAFLORE XAROM": hl * 20, // 20 g/hl
+  };
+
+  return (
+    <div className="p-6 max-w-4xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4">Kalkulator Laffort – Zapotrzebowanie i Magazyn</h1>
+
+      <Card className="mb-6">
+        <CardContent className="space-y-4 pt-4">
+          <Label htmlFor="hl">Produkcja wina [hl]</Label>
+          <Input
+            id="hl"
+            type="number"
+            value={hl}
+            onChange={(e) => setHl(parseFloat(e.target.value) || 0)}
+            placeholder="np. 50"
+          />
+        </CardContent>
+      </Card>
+
+      <Card className="mb-6">
+        <CardContent className="space-y-4 pt-4">
+          <h2 className="text-xl font-semibold">Stan magazynowy</h2>
+          {Object.keys(stock).map((key) => (
+            <div key={key}>
+              <Label htmlFor={key}>{key} [g]</Label>
+              <Input
+                id={key}
+                type="number"
+                value={stock[key]}
+                onChange={(e) =>
+                  setStock({ ...stock, [key]: parseFloat(e.target.value) || 0 })
+                }
+              />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="space-y-4 pt-4">
+          <h2 className="text-xl font-semibold">Zapotrzebowanie</h2>
+          {Object.keys(zapotrzebowanie).map((key) => {
+            const needed = zapotrzebowanie[key];
+            const available = stock[key];
+            const status = available >= needed ? "✅ OK" : "❌ Brakuje";
+
+            return (
+              <div key={key} className="flex justify-between">
+                <span>{key}</span>
+                <span>
+                  {needed.toFixed(2)} g / magazyn: {available.toFixed(2)} g → {status}
+                </span>
+              </div>
+            );
+          })}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
